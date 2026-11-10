@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>LogiCraft Pro v3.5 — Mantiqiy Elementlar va Sxematexnika Simulyatori</title>
+  
+  <!-- Inter & JetBrains Mono Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <!-- Maxsus uslublar -->
+  <link rel="stylesheet" href="style.css">
+</head>
+<body class="bg-[var(--bg-app)] text-[var(--text-main)] overflow-hidden select-none">
+
+<!-- MOBIL FON BACKDROP (Sidebar ochilganda fonni xiralashtirish) -->
+<div id="sidebarBackdrop" onclick="closeMobileSidebar()"></div>
+
+<!-- ASOSIY KONTEYNER -->
+<div class="flex h-screen w-screen overflow-hidden">
+
+  <!-- CHAP PANEL: ELEMENTLAR PALITRASI (DESKTOP & MOBIL DRAWER) -->
+  <aside id="sidebar" class="w-[285px] min-w-[285px] bg-[var(--bg-sidebar)] border-r border-[var(--border-subtle)] flex flex-col z-50 shadow-xl transition-transform duration-300">
+    
+    <!-- Brend & Sarlavha -->
+    <div class="p-3.5 border-b border-[var(--border-subtle)] bg-[var(--bg-header)] flex items-center justify-between">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 bg-gradient-to-tr from-blue-600 via-indigo-500 to-cyan-400 rounded-lg flex items-center justify-center text-white font-black text-sm shadow-md shadow-blue-500/20">
+          ⚡
+        </div>
+        <div>
+          <div class="font-bold text-sm tracking-wide flex items-center gap-1.5 text-[var(--text-main)]">
+            LogiCraft Pro <span class="badge bg-blue-500/20 text-blue-400 border border-blue-500/30">v3.5</span>
+          </div>
+          <div class="text-[10px] text-[var(--text-muted)] font-medium">Sxematexnika Simulyatori</div>
+        </div>
+      </div>
+      <!-- Mobil uchun yopish tugmasi -->
+      <button onclick="closeMobileSidebar()" class="md:hidden text-[var(--text-muted)] hover:text-[var(--text-main)] p-1 text-lg">
+        ✕
+      </button>
+    </div>
+
+    <!-- Qidiruv maydoni -->
+    <div class="px-3 pt-2.5 pb-1">
+      <div class="relative">
+        <input id="paletteSearch" type="text" placeholder="Element qidirish... (RS, D, AND, 555)" 
+          class="w-full bg-[var(--bg-input)] border border-[var(--border-strong)] text-xs text-[var(--text-main)] placeholder-[var(--text-faint)] rounded-lg px-2.5 py-1.5 pl-7 focus:outline-none focus:border-[var(--border-focus)] transition"
+          oninput="filterPalette(this.value)">
+        <span class="absolute left-2.5 top-1.5 text-[var(--text-faint)] text-xs">🔍</span>
+      </div>
+    </div>
+
+    <!-- Elementlar toifalari ro'yxati -->
+    <div class="flex-1 overflow-y-auto px-2.5 py-2 space-y-3.5" id="paletteList">
+
+      <!-- 1. Kirish / Manbalar -->
+      <div class="palette-category" data-cat="sources">
+        <div class="text-[10px] font-bold text-[var(--text-muted)] uppercase tracking-wider mb-1.5 px-1.5 flex items-center justify-between">
+          <span>Kirish & Manbalar</span>
+          <span class="text-[9px] text-[var(--text-faint)]">Inputs</span>
+        </div>
+        <div class="space-y-1">
+          <div class="sidebar-item flex items-center gap-2.5 p-2 rounded-lg" draggable="true" data-type="INPUT" title="Bosing yoki canvasga torting">
+            <div class="w-7 h-7 rounded-md bg-green-500/10 border border-green-500/30 flex items-center justify-center text-green-400 text-xs font-bold">1/0</div>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-semibold text-[var(--text-main)]">Kalit (Input Switch)</div>
+              <div class="text-[10px] text-[var(--text-muted)] truncate">0 yoki 1 doimiy signal beradi</div>
+            </div>
+            <span class="text-[10px] text-[var(--text-faint)] md:hidden">+Qo'shish</span>
+          </div>
+
+          <div class="sidebar-item flex items-center gap-2.5 p-2 rounded-lg" draggable="true" data-type="PULSE" title="Bosing yoki canvasga torting">
+            <div class="w-7 h-7 rounded-md bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-xs font-bold">⎍</div>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-semibold text-[var(--text-main)]">Impuls Tugmasi (Pulse)</div>
+              <div class="text-[10px] text-[var(--text-muted)] truncate">Bir martalik qisqa takt pulsi</div>
+            </div>
+            <span class="text-[10px] text-[var(--text-faint)] md:hidden">+Qo'shish</span>
+          </div>
+
+          <div class="sidebar-item flex items-center gap-2.5 p-2 rounded-lg" draggable="true" data-type="CLOCK" title="Bosing yoki canvasga torting">
+            <div class="w-7 h-7 rounded-md bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center text-cyan-400 text-xs font-bold">CLK</div>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-semibold text-[var(--text-main)]">Takt Generatori (Clock)</div>
+              <div class="text-[10px] text-[var(--text-muted)] truncate">Sinxron soat impulslari</div>
+            </div>
+            <span class="text-[10px] text-[var(--text-faint)] md:hidden">+Qo'shish</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Sxematexnika: Triggerlar va Xotira -->
+      <div class="palette-category" data-cat="latches">
+        <div class="text-[10px] font-bold text-pink-400 uppercase tracking-wider mb-1.5 px-1.5 flex items-center justify-between">
+          <span>Triggerlar & Xotira</span>
+          <span class="badge bg-pink-500/20 text-pink-400 border border-pink-500/30">Sxematexnika</span>
+        </div>
+        <div class="space-y-1">
+          <div class="sidebar-item flex items-center gap-2.5 p-2 rounded-lg hover:border-pink-500/50" draggable="true" data-type="RS_LATCH">
+            <div class="w-7 h-7 rounded-md bg-rose-500/15 border border-rose-500/40 flex items-center justify-center text-rose-400 text-xs font-bold">RS</div>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-semibold text-[var(--text-main)] flex items-center justify-between">
+                <span>RS-Trigger (Latch)</span>
+                <span class="text-[9px] text-rose-400">Asinxron</span>
+              </div>
+              <div class="text-[10px] text-[var(--text-muted)] truncate">Set/Reset 1-bit statik xotira</div>
+            </div>
+          </div>
+
+          <div class="sidebar-item flex items-center gap-2.5 p-2 rounded-lg hover:border-pink-500/50" draggable="true" data-type="SR_FF">
+            <div class="w-7 h-7 rounded-md bg-pink-500/15 border border-pink-500/40 flex items-center justify-center text-pink-400 text-xs font-bold">SR</div>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-semibold text-[var(--text-main)] flex items-center justify-between">
+                <span>Sinxron SR-Trigger</span>
+                <span class="text-[9px] text-pink-400">CLK</span>
+              </div>
+              <div class="text-[10px] text-[var(--text-muted)] truncate">Soat bilan boshqariluvchi SR</div>
+            </div>
+          </div>
+
+          <div class="sidebar-item flex items-center gap-2.5 p-2 rounded-lg hover:border-purple-500/50" draggable="true" data-type="D_FF">
+            <div class="w-7 h-7 rounded-md bg-fuchsia-500/15 border border-fuchsia-500/40 flex items-center justify-center text-fuchsia-400 text-xs font-bold">D</div>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-semibold text-[var(--text-main)] flex items-center justify-between">
+                <span>D-Trigger (Flip-Flop)</span>
+                <span class="text-[9px] text-fuchsia-400">Front</span>
+              </div>
+              <div class="text-[10px] text-[var(--text-muted)] truncate">Ma'lumot registri katakchasi</div>
+            </div>
+          </div>
+
+          <div class="sidebar-item flex items-center gap-2.5 p-2 rounded-lg hover:border-purple-500/50" draggable="true" data-type="JK_FF">
+            <div class="w-7 h-7 rounded-md bg-purple-500/15 border border-purple-500/40 flex items-center justify-center text-purple-400 text-xs font-bold">JK</div>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-semibold text-[var(--text-main)] flex items-center justify-between">
+                <span>JK-Trigger</span>
+                <span class="text-[9px] text-purple-400">Universal</span>
+              </div>
+              <div class="text-[10px] text-[var(--text-muted)] truncate">Universal hisoblagich asosi</div>
+            </div>
+          </div>
+
+          <div class="sidebar-item flex items-center gap-2.5 p-2 rounded-lg hover:border-purple-500/50" draggable="true" data-type="T_FF">
+            <div class="w-7 h-7 rounded-md bg-violet-500/15 border border-violet-500/40 flex items-center justify-center text-violet-400 text-xs font-bold">T</div>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-semibold text-[var(--text-main)] flex items-center justify-between">
+                <span>T-Trigger (Toggle)</span>
+                <span class="text-[9px] text-violet-400">/2 Bo'lgich</span>
+              </div>
+              <div class="text-[10px] text-[var(--text-muted)] truncate">Chastotani 2 ga bo'lish</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Taymerlar va Vaqt elementlari -->
+      <div class="palette-category" data-cat="timers">
+        <div class="text-[10px] font-bold text-amber-400 uppercase tracking-wider mb-1.5 px-1.5 flex items-center justify-between">
+          <span>Taymerlar & Kechikish</span>
+          <span class="badge bg-amber-500/20 text-amber-400 border border-amber-500/30">Vaqt</span>
+        </div>
+        <div class="space-y-1">
+          <div class="sidebar-item flex items-center gap-2.5 p-2 rounded-lg hover:border-amber-500/50" draggable="true" data-type="TIMER">
+            <div class="w-7 h-7 rounded-md bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-amber-400 text-xs font-bold">555</div>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-semibold text-[var(--text-main)] flex items-center justify-between">
+                <span>Monostabil Taymer</span>
+                <span class="text-[9px] text-amber-400">NE555</span>
+              </div>
+              <div class="text-[10px] text-[var(--text-muted)] truncate">Vaqt relesi (sozlanuvchi ms)</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Asosiy Mantiqiy Elementlar -->
+      <div class="palette-category" data-cat="basic">
+        <div class="text-[10px] font-bold text-blue-400 uppercase tracking-wider mb-1.5 px-1.5 flex items-center justify-between">
+          <span>Asosiy Mantiqiy Elementlar</span>
+          <span class="text-[9px] text-[var(--text-faint)]">Gates</span>
+        </div>
+        <div class="space-y-1">
+          <div class="sidebar-item flex items-center gap-2.5 p-2 rounded-lg" draggable="true" data-type="AND">
+            <div class="w-7 h-7 rounded-md bg-blue-500/15 border border-blue-500/40 flex items-center justify-center text-blue-400 text-xs font-bold">&</div>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-semibold text-[var(--text-main)]">AND (Mantiqiy VA)</div>
+              <div class="text-[10px] text-[var(--text-muted)] truncate">Y = A · B (Ko'paytirish)</div>
+            </div>
+          </div>
+
+          <div class="sidebar-item flex items-center gap-2.5 p-2 rounded-lg" draggable="true" data-type="OR">
+            <div class="w-7 h-7 rounded-md bg-indigo-500/15 border border-indigo-500/40 flex items-center justify-center text-indigo-400 text-xs font-bold">≥1</div>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-semibold text-[var(--text-main)]">OR (Mantiqiy YOKI)</div>
+              <div class="text-[10px] text-[var(--text-muted)] truncate">Y = A + B (Qo'shish)</div>
+            </div>
+          </div>
+
+          <div class="sidebar-item flex items-center gap-2.5 p-2 rounded-lg" draggable="true" data-type="NOT">
+            <div class="w-7 h-7 rounded-md bg-red-500/15 border border-red-500/40 flex items-center justify-center text-red-400 text-xs font-bold">1</div>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-semibold text-[var(--text-main)]">NOT (Invertor)</div>
+              <div class="text-[10px] text-[var(--text-muted)] truncate">Y = ¬A (Mantiqiy inkor)</div>
+            </div>
+          </div>
+
+          <div class="sidebar-item flex items-center gap-2.5 p-2 rounded-lg" draggable="true" data-type="NAND">
+            <div class="w-7 h-7 rounded-md bg-cyan-500/15 border border-cyan-500/40 flex items-center justify-center text-cyan-400 text-xs font-bold">&̄</div>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-semibold text-[var(--text-main)]">NAND (VA-EMAS)</div>
+              <div class="text-[10px] text-[var(--text-muted)] truncate">Sheffer shtrixi (Universal)</div>
+            </div>
+          </div>
+
+          <div class="sidebar-item flex items-center gap-2.5 p-2 rounded-lg" draggable="true" data-type="NOR">
+            <div class="w-7 h-7 rounded-md bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-amber-400 text-xs font-bold">≥1̄</div>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-semibold text-[var(--text-main)]">NOR (YOKI-EMAS)</div>
+              <div class="text-[10px] text-[var(--text-muted)] truncate">Pirs strelkasi (Universal)</div>
+            </div>
+          </div>
+
+          <div class="sidebar-item flex items-center gap-2.5 p-2 rounded-lg" draggable="true" data-type="XOR">
+            <div class="w-7 h-7 rounded-md bg-emerald-500/15 border border-emerald-500/40 flex items-center justify-center text-emerald-400 text-xs font-bold">=1</div>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-semibold text-[var(--text-main)]">XOR (Eksklyuziv YOKI)</div>
+              <div class="text-[10px] text-[var(--text-muted)] truncate">Modul 2 bo'yicha qo'shish</div>
+            </div>
+          </div>
+
+          <div class="sidebar-item flex items-center gap-2.5 p-2 rounded-lg" draggable="true" data-type="XNOR">
+            <div class="w-7 h-7 rounded-md bg-pink-500/15 border border-pink-500/40 flex items-center justify-center text-pink-400 text-xs font-bold">=1̄</div>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-semibold text-[var(--text-main)]">XNOR (Ekvivalentlik)</div>
+              <div class="text-[10px] text-[var(--text-muted)] truncate">Tenglik indikatori</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Murakkab Sxemalar va Aritmetika -->
+      <div class="palette-category" data-cat="compound">
+        <div class="text-[10px] font-bold text-emerald-400 uppercase tracking-wider mb-1.5 px-1.5 flex items-center justify-between">
+          <span>Aritmetika & Kommutatsiya</span>
+          <span class="text-[9px] text-[var(--text-faint)]">MSI</span>
+        </div>
+        <div class="space-y-1">
+          <div class="sidebar-item flex items-center gap-2.5 p-2 rounded-lg" draggable="true" data-type="HALF_ADDER">
+            <div class="w-7 h-7 rounded-md bg-green-500/15 border border-green-500/40 flex items-center justify-center text-green-400 text-xs font-bold">HA</div>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-semibold text-[var(--text-main)]">Yarim Qo'shgich (Half Adder)</div>
+              <div class="text-[10px] text-[var(--text-muted)] truncate">2 bit yig'indi + ko'chirish</div>
+            </div>
+          </div>
+
+          <div class="sidebar-item flex items-center gap-2.5 p-2 rounded-lg" draggable="true" data-type="FULL_ADDER">
+            <div class="w-7 h-7 rounded-md bg-teal-500/15 border border-teal-500/40 flex items-center justify-center text-teal-400 text-xs font-bold">FA</div>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-semibold text-[var(--text-main)]">To'liq Qo'shgich (Full Adder)</div>
+              <div class="text-[10px] text-[var(--text-muted)] truncate">A + B + Cin (ALU asosi)</div>
+            </div>
+          </div>
+
+          <div class="sidebar-item flex items-center gap-2.5 p-2 rounded-lg" draggable="true" data-type="MUX">
+            <div class="w-7 h-7 rounded-md bg-purple-500/15 border border-purple-500/40 flex items-center justify-center text-purple-400 text-xs font-bold">MX</div>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-semibold text-[var(--text-main)]">Multipleksor (2:1 MUX)</div>
+              <div class="text-[10px] text-[var(--text-muted)] truncate">Ma'lumotlar kanali selektori</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. Chiqish va Indikatorlar -->
+      <div class="palette-category" data-cat="outputs">
+        <div class="text-[10px] font-bold text-amber-400 uppercase tracking-wider mb-1.5 px-1.5 flex items-center justify-between">
+          <span>Chiqish & Indikatorlar</span>
+          <span class="text-[9px] text-[var(--text-faint)]">Display</span>
+        </div>
+        <div class="space-y-1">
+          <div class="sidebar-item flex items-center gap-2.5 p-2 rounded-lg" draggable="true" data-type="OUTPUT">
+            <div class="w-7 h-7 rounded-md bg-amber-500/15 border border-amber-500/40 flex items-center justify-center text-amber-400 text-xs font-bold">LED</div>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-semibold text-[var(--text-main)]">LED Indikator</div>
+              <div class="text-[10px] text-[var(--text-muted)] truncate">Chiqish signali lampochkasi</div>
+            </div>
+          </div>
+
+          <div class="sidebar-item flex items-center gap-2.5 p-2 rounded-lg" draggable="true" data-type="BUZZER">
+            <div class="w-7 h-7 rounded-md bg-rose-500/15 border border-rose-500/40 flex items-center justify-center text-rose-400 text-xs font-bold">🔊</div>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-semibold text-[var(--text-main)]">Ovozli Signalizator (Buzzer)</div>
+              <div class="text-[10px] text-[var(--text-muted)] truncate">1 bo'lganda akustik signal</div>
+            </div>
+          </div>
+
+          <div class="sidebar-item flex items-center gap-2.5 p-2 rounded-lg" draggable="true" data-type="SEV_SEG">
+            <div class="w-7 h-7 rounded-md bg-teal-500/15 border border-teal-500/40 flex items-center justify-center text-teal-400 text-xs font-bold">8.</div>
+            <div class="flex-1 min-w-0">
+              <div class="text-xs font-semibold text-[var(--text-main)]">7-Segment Displey</div>
+              <div class="text-[10px] text-[var(--text-muted)] truncate">4-bit ikkilik raqam indikatori</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Sidebar pastki ma'lumoti -->
+    <div class="p-2.5 border-t border-[var(--border-subtle)] bg-[var(--bg-app)] flex items-center justify-between text-[11px] text-[var(--text-muted)]">
+      <span class="flex items-center gap-1">📱 Bosing yoki torting</span>
+      <button onclick="openEncyclopedia()" class="text-blue-500 hover:text-blue-400 font-medium underline flex items-center gap-1">
+        📚 Ensiklopediya
+      </button>
+    </div>
+  </aside>
+
+  <!-- O'RTA QISM: ISH STOLI VA BOSHQARUV TIZIMI -->
+  <main class="flex-1 flex flex-col relative overflow-hidden bg-[var(--canvas-bg)]">
+    
+    <!-- YUQORI ASBOBLAR PANELI (TOOLBAR) -->
+    <header class="h-12 bg-[var(--bg-header)] border-b border-[var(--border-subtle)] flex items-center justify-between px-2 sm:px-3 z-30 select-none">
+      
+      <!-- Chap tomon: Gamburger (mobil), Fayl & Tarix -->
+      <div class="flex items-center gap-1">
+        <!-- Mobil Gamburger menyu tugmasi -->
+        <button onclick="toggleMobileSidebar()" class="md:hidden btn p-1.5 rounded-lg bg-[var(--bg-card)] text-[var(--text-main)] border border-[var(--border-strong)]" title="Elementlar menyusi">
+          ☰
+        </button>
+
+        <button onclick="newCircuit()" class="btn px-2 py-1.5 rounded-lg text-xs bg-[var(--bg-card)] hover:bg-[var(--bg-surface-hover)] text-[var(--text-main)] border border-[var(--border-strong)] flex items-center gap-1" title="Yangi toza sxema">
+          <span>📄</span> <span class="hidden md:inline">Yangi</span>
+        </button>
+        <button onclick="saveCircuit()" class="btn px-2 py-1.5 rounded-lg text-xs bg-[var(--bg-card)] hover:bg-[var(--bg-surface-hover)] text-[var(--text-main)] border border-[var(--border-strong)] flex items-center gap-1" title="Sxemani saqlash (JSON)">
+          <span>💾</span> <span class="hidden md:inline">Saqlash</span>
+        </button>
+        <button onclick="loadCircuit()" class="btn px-2 py-1.5 rounded-lg text-xs bg-[var(--bg-card)] hover:bg-[var(--bg-surface-hover)] text-[var(--text-main)] border border-[var(--border-strong)] flex items-center gap-1" title="Fayldan yuklash">
+          <span>📂</span> <span class="hidden md:inline">Yuklash</span>
+        </button>
+        <button onclick="exportPNG()" class="btn px-2 py-1.5 rounded-lg text-xs bg-[var(--bg-card)] hover:bg-[var(--bg-surface-hover)] text-[var(--text-main)] border border-[var(--border-strong)] hidden sm:flex items-center gap-1" title="Sxemani PNG rasm qilib saqlash">
+          <span>📷</span> <span class="hidden lg:inline">Rasm (PNG)</span>
+        </button>
+
+        <div class="h-5 w-[1px] bg-[var(--border-subtle)] mx-0.5 sm:mx-1"></div>
+
+        <button onclick="undo()" class="btn p-1.5 rounded-lg text-xs bg-[var(--bg-card)] hover:bg-[var(--bg-surface-hover)] text-[var(--text-main)] border border-[var(--border-strong)]" title="Bekor qilish (Ctrl+Z)">↩</button>
+        <button onclick="redo()" class="btn p-1.5 rounded-lg text-xs bg-[var(--bg-card)] hover:bg-[var(--bg-surface-hover)] text-[var(--text-main)] border border-[var(--border-strong)]" title="Qaytarish (Ctrl+Y)">↪</button>
+        <button onclick="deleteSelected()" class="btn p-1.5 rounded-lg text-xs bg-[var(--bg-card)] hover:bg-rose-900/30 text-rose-400 border border-[var(--border-strong)]" title="O'chirish (Delete)">🗑</button>
+      </div>
+
+      <!-- O'rta tomon: Simulyatsiya & Asboblar -->
+      <div class="flex items-center gap-1 sm:gap-1.5">
+        <button id="simBtn" onclick="toggleSimulation()" class="btn px-2.5 sm:px-3 py-1.5 rounded-lg text-xs font-semibold bg-emerald-600/30 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/40 flex items-center gap-1 shadow-sm">
+          <span id="simIcon">⏸</span> <span id="simText" class="hidden sm:inline">Faol</span>
+        </button>
+
+        <button onclick="showTruthTable()" class="btn px-2 py-1.5 rounded-lg text-xs bg-[var(--bg-card)] hover:bg-[var(--bg-surface-hover)] text-[var(--text-main)] border border-[var(--border-strong)] hidden sm:flex items-center gap-1" title="Haqiqat jadvalini hisoblash">
+          <span>📊</span> <span class="hidden lg:inline">Haqiqat Jadvali</span>
+        </button>
+
+        <button id="analyzerBtn" onclick="toggleAnalyzer()" class="btn px-2 py-1.5 rounded-lg text-xs bg-[var(--bg-card)] hover:bg-[var(--bg-surface-hover)] text-[var(--text-main)] border border-[var(--border-strong)] hidden md:flex items-center gap-1" title="Vaqt diagrammasi / Osiloskop">
+          <span>📈</span> <span class="hidden lg:inline">Osiloskop</span>
+        </button>
+
+        <!-- Namunalar menyusi -->
+        <div class="relative group">
+          <button class="btn px-2 sm:px-2.5 py-1.5 rounded-lg text-xs bg-indigo-950/60 hover:bg-indigo-900/70 text-indigo-300 border border-indigo-700/50 flex items-center gap-1">
+            <span>🧪 Namunalar</span> <span class="text-[9px]">▼</span>
+          </button>
+          <div class="absolute right-0 top-full mt-1 w-56 bg-[var(--bg-surface)] border border-[var(--border-strong)] rounded-xl shadow-2xl p-1.5 hidden group-hover:block z-50">
+            <div class="text-[10px] font-bold text-[var(--text-muted)] px-2 py-1 uppercase">Tayyor Sxemalar</div>
+            <button onclick="loadDemoPreset('RS_LATCH')" class="w-full text-left px-2.5 py-1.5 text-xs rounded-lg hover:bg-pink-600/20 text-[var(--text-main)] flex items-center justify-between">
+              <span>1. RS-Trigger Xotira</span> <span class="text-[10px] text-pink-400">1-bit Latch</span>
+            </button>
+            <button onclick="loadDemoPreset('HALF_ADDER')" class="w-full text-left px-2.5 py-1.5 text-xs rounded-lg hover:bg-blue-600/20 text-[var(--text-main)] flex items-center justify-between">
+              <span>2. Yarim Qo'shgich (HA)</span> <span class="text-[10px] text-blue-400">Aritmetika</span>
+            </button>
+            <button onclick="loadDemoPreset('D_FLIPFLOP')" class="w-full text-left px-2.5 py-1.5 text-xs rounded-lg hover:bg-purple-600/20 text-[var(--text-main)] flex items-center justify-between">
+              <span>3. D-Trigger Registr</span> <span class="text-[10px] text-purple-400">Frontli</span>
+            </button>
+            <button onclick="loadDemoPreset('JK_COUNTER')" class="w-full text-left px-2.5 py-1.5 text-xs rounded-lg hover:bg-teal-600/20 text-[var(--text-main)] flex items-center justify-between">
+              <span>4. 2-Bitli Hisoblagich</span> <span class="text-[10px] text-teal-400">JK + 7-Seg</span>
+            </button>
+            <button onclick="loadDemoPreset('TIMER_555')" class="w-full text-left px-2.5 py-1.5 text-xs rounded-lg hover:bg-amber-600/20 text-[var(--text-main)] flex items-center justify-between">
+              <span>5. 555 Taymer Avtomatika</span> <span class="text-[10px] text-amber-400">Vaqt relesi</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- O'ng tomon: Mavzu (Yoriq/Qorong'u), Ovoz, Zoom & Grid -->
+      <div class="flex items-center gap-1 sm:gap-1.5 text-xs text-[var(--text-muted)]">
+        <!-- Ovoz yoqish/o'chirish -->
+        <button id="soundBtn" onclick="toggleSound()" class="btn p-1.5 rounded-lg bg-[var(--bg-card)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-strong)] text-[var(--text-main)]" title="Ovozli effektlarni yoqish/o'chirish">
+          🔊
+        </button>
+
+        <!-- Yoriq / Qorong'u Mavzu Switch -->
+        <button onclick="toggleTheme()" class="btn p-1.5 rounded-lg bg-[var(--bg-card)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-strong)] text-[var(--text-main)]" title="Mavzuni almashtirish (Yoriq / Qorong'u)">
+          <span id="themeIcon">🌙</span>
+        </button>
+
+        <button onclick="zoomOut()" class="btn p-1.5 rounded-lg bg-[var(--bg-card)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-strong)] hidden sm:inline-flex" title="Kichraytirish">🔍−</button>
+        <span id="zoomDisplay" class="font-mono text-[var(--text-main)] w-10 text-center font-semibold text-[11px] hidden sm:inline-block">100%</span>
+        <button onclick="zoomIn()" class="btn p-1.5 rounded-lg bg-[var(--bg-card)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-strong)] hidden sm:inline-flex" title="Kattalashtirish">🔍+</button>
+        <button onclick="resetView()" class="btn p-1.5 rounded-lg bg-[var(--bg-card)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-strong)]" title="Markazga qaytarish">⊙</button>
+        <button onclick="toggleGrid()" id="gridBtn" class="btn p-1.5 rounded-lg bg-[var(--bg-card)] hover:bg-[var(--bg-surface-hover)] border border-[var(--border-strong)] text-blue-400 hidden sm:inline-flex" title="To'rni yoqish/o'chirish">#</button>
+      </div>
+    </header>
+
+    <!-- CANVAS ISH MAYDONI -->
+    <div class="flex-1 relative overflow-hidden bg-[var(--canvas-bg)]" id="canvasContainer">
+      <canvas id="canvas"></canvas>
+
+      <!-- HOVER HUD INSPECTOR (Ustiga kelganda chiqadigan ma'lumot) -->
+      <div id="hudInspector" class="hidden opacity-0 pointer-events-none">
+        <div class="flex items-start justify-between gap-2 border-b border-[var(--border-strong)] pb-2 mb-2">
+          <div>
+            <div id="hudTitle" class="text-sm font-bold text-[var(--text-main)] flex items-center gap-1.5">AND Gate</div>
+            <div id="hudType" class="text-[10px] text-blue-400 font-mono">ASOSIY MANTIQIY ELEMENT</div>
+          </div>
+          <span id="hudBadge" class="badge bg-blue-500/20 text-blue-300 border border-blue-500/30">Mantiq</span>
+        </div>
+
+        <div class="mb-2">
+          <div class="text-[10px] font-bold text-amber-400 flex items-center gap-1 mb-0.5">
+            <span>⚡ Nima ish qiladi:</span>
+          </div>
+          <div id="hudDesc" class="text-[11px] text-[var(--text-main)] leading-snug">
+            Barcha kirish signallari 1 bo'lgandagina chiqishda 1 beradi.
+          </div>
+        </div>
+
+        <div class="mb-2">
+          <div class="text-[10px] font-bold text-cyan-400 flex items-center gap-1 mb-0.5">
+            <span>🏭 Nima uchun ishlatiladi:</span>
+          </div>
+          <div id="hudUsage" class="text-[11px] text-[var(--text-muted)] leading-snug">
+            Ruxsat berish shartlari, xavfsizlik blokirovkalari va konyunksiya.
+          </div>
+        </div>
+
+        <div class="bg-[var(--bg-app)] p-1.5 rounded-md border border-[var(--border-subtle)] mb-2 flex items-center justify-between">
+          <span class="text-[10px] text-[var(--text-muted)] font-mono">Formula:</span>
+          <span id="hudFormula" class="text-[11px] font-mono text-emerald-400 font-bold">Y = A · B</span>
+        </div>
+
+        <div class="border-t border-[var(--border-subtle)] pt-1.5 flex items-center justify-between text-[10px] font-mono">
+          <span class="text-[var(--text-muted)]">Kirish: <span id="hudInSignals" class="text-[var(--text-main)] font-bold">[0, 1]</span></span>
+          <span class="text-[var(--text-muted)]">Chiqish: <span id="hudOutSignals" class="text-emerald-400 font-bold">[0]</span></span>
+        </div>
+      </div>
+
+      <!-- XUSUSIYATLAR PANELI (PROPERTIES) -->
+      <div id="propsPanel" class="absolute right-3 top-3 w-64 bg-[var(--bg-hud)] backdrop-blur-md border border-[var(--border-strong)] rounded-xl p-3.5 shadow-2xl hidden z-40 transition-all">
+        <div class="flex justify-between items-center mb-2.5 border-b border-[var(--border-subtle)] pb-2">
+          <div class="flex items-center gap-1.5">
+            <span class="text-xs font-bold text-[var(--text-main)]">Xususiyatlar</span>
+            <span id="propsTypeBadge" class="badge bg-blue-500/20 text-blue-400">TYPE</span>
+          </div>
+          <button onclick="hideProps()" class="text-[var(--text-muted)] hover:text-[var(--text-main)] text-sm p-1">✕</button>
+        </div>
+        <div id="propsContent" class="space-y-2.5 max-h-[75vh] overflow-y-auto pr-1"></div>
+      </div>
+
+      <!-- MINI-MAP (KICHIK XARITA) -->
+      <div id="minimapContainer" class="absolute bottom-3 right-3 bg-[var(--bg-hud)] border border-[var(--border-strong)] rounded-xl p-1 shadow-2xl z-20 pointer-events-none">
+        <canvas id="minimap" width="160" height="100" class="rounded-lg"></canvas>
+      </div>
+
+      <!-- ISH MAYDONI KO'RSATMASI (HINT) -->
+      <div class="absolute bottom-3 left-3 bg-[var(--bg-hud)] backdrop-blur border border-[var(--border-subtle)] rounded-lg px-2.5 py-1 text-[11px] text-[var(--text-muted)] pointer-events-none z-10 flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+        <span id="canvasHint">Portlarni bosib sim ulang | Elementni bosing: boshqaruv</span>
+      </div>
+
+      <!-- LOGIC ANALYZER / OSILOSKOP PASTKI TORTMASI -->
+      <div id="analyzerDrawer" class="collapsed flex flex-col p-2.5 select-none">
+        <div class="flex items-center justify-between pb-1.5 border-b border-[var(--border-subtle)] mb-1.5">
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-xs text-[var(--text-main)] flex items-center gap-1.5">
+              <span>📈</span> Mantiqiy Vaqt Diagrammasi (Logic Waveform Analyzer)
+            </span>
+            <span class="text-[10px] text-cyan-400 font-mono">Jonli Takt & Signallar</span>
+          </div>
+          <button onclick="toggleAnalyzer()" class="text-xs text-[var(--text-muted)] hover:text-[var(--text-main)] px-2 py-0.5 rounded">
+            ✕ Yopish
+          </button>
+        </div>
+        <div class="flex-1 overflow-hidden relative">
+          <canvas id="analyzerCanvas" class="w-full h-full block rounded"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- MOBIL UCHUN TEZKOR FLOATING PANEL (PASTDA) -->
+    <div id="mobileQuickBar" class="hidden md:hidden absolute bottom-8 left-1/2 -translate-x-1/2 bg-[var(--bg-hud)] border border-[var(--border-strong)] rounded-full px-4 py-2 shadow-2xl z-30 flex items-center gap-3 backdrop-blur-md">
+      <button onclick="toggleMobileSidebar()" class="text-base text-blue-400" title="Element qo'shish">➕ Element</button>
+      <div class="w-[1px] h-4 bg-[var(--border-strong)]"></div>
+      <button onclick="toggleSimulation()" class="text-base text-emerald-400" title="Simulyatsiya">▶/⏸</button>
+      <div class="w-[1px] h-4 bg-[var(--border-strong)]"></div>
+      <button onclick="undo()" class="text-base text-[var(--text-main)]" title="Undo">↩</button>
+      <button onclick="deleteSelected()" class="text-base text-rose-400" title="Delete">🗑</button>
+      <div class="w-[1px] h-4 bg-[var(--border-strong)]"></div>
+      <button onclick="resetView()" class="text-base text-[var(--text-muted)]" title="Center">⊙</button>
+    </div>
+
+    <!-- STATUS BAR (HOLAT SATRI) -->
+    <footer class="h-6 bg-[var(--bg-app)] border-t border-[var(--border-subtle)] flex items-center justify-between px-3 text-[10px] text-[var(--text-muted)] z-30 select-none">
+      <div class="flex items-center gap-3">
+        <span id="statusMsg" class="font-medium text-[var(--text-main)] truncate max-w-[200px] sm:max-w-none">Tayyor</span>
+        <span id="coordDisplay" class="font-mono text-[var(--text-faint)] hidden sm:inline">X: 0, Y: 0</span>
+      </div>
+      <div class="flex items-center gap-3 font-mono">
+        <span id="componentCount">Elementlar: 0</span>
+        <span id="wireCount" class="hidden sm:inline">Simlar: 0</span>
+        <span id="fpsDisplay" class="text-emerald-500 font-semibold flex items-center gap-1">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> 60 FPS
+        </span>
+      </div>
+    </footer>
+  </main>
+</div>
+
+<!-- ===================== MODALLAR ===================== -->
+
+<!-- 1. ENSIKLOPEDIYA MODALI -->
+<div id="encyclopediaModal" class="modal-overlay hidden">
+  <div class="modal-card w-[860px] max-w-[95vw] h-[85vh] flex flex-col">
+    <!-- Header -->
+    <div class="p-4 border-b border-[var(--border-strong)] flex items-center justify-between bg-[var(--bg-surface)]">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-blue-600/20 border border-blue-500/40 flex items-center justify-center text-blue-400 font-bold">
+          📚
+        </div>
+        <div>
+          <h2 class="text-base font-bold text-[var(--text-main)]">Mantiqiy Elementlar va Sxematexnika Ensiklopediyasi</h2>
+          <p class="text-xs text-[var(--text-muted)]">Ishlash printsipi, sanoat mikrosxemalari va formulalar</p>
+        </div>
+      </div>
+      <button onclick="closeEncyclopedia()" class="text-[var(--text-muted)] hover:text-[var(--text-main)] text-xl p-1">✕</button>
+    </div>
+
+    <!-- Filter tabs -->
+    <div class="px-4 py-2 bg-[var(--bg-app)] border-b border-[var(--border-subtle)] flex items-center gap-2 overflow-x-auto text-xs">
+      <button onclick="filterEncyclopedia('all', this)" class="enc-tab active px-3 py-1 rounded-md bg-blue-600 text-white font-medium">Barchasi</button>
+      <button onclick="filterEncyclopedia('latches', this)" class="enc-tab px-3 py-1 rounded-md bg-[var(--bg-card)] hover:bg-[var(--bg-surface-hover)] text-[var(--text-muted)]">Triggerlar & Xotira</button>
+      <button onclick="filterEncyclopedia('timers', this)" class="enc-tab px-3 py-1 rounded-md bg-[var(--bg-card)] hover:bg-[var(--bg-surface-hover)] text-[var(--text-muted)]">Taymerlar (555)</button>
+      <button onclick="filterEncyclopedia('basic', this)" class="enc-tab px-3 py-1 rounded-md bg-[var(--bg-card)] hover:bg-[var(--bg-surface-hover)] text-[var(--text-muted)]">Asosiy Elementlar</button>
+      <button onclick="filterEncyclopedia('compound', this)" class="enc-tab px-3 py-1 rounded-md bg-[var(--bg-card)] hover:bg-[var(--bg-surface-hover)] text-[var(--text-muted)]">Aritmetika & Kommutatsiya</button>
+      <button onclick="filterEncyclopedia('outputs', this)" class="enc-tab px-3 py-1 rounded-md bg-[var(--bg-card)] hover:bg-[var(--bg-surface-hover)] text-[var(--text-muted)]">Chiqish & Indikatorlar</button>
+    </div>
+
+    <!-- Content list -->
+    <div id="encyclopediaContent" class="flex-1 overflow-y-auto p-4 space-y-4"></div>
+
+    <!-- Footer -->
+    <div class="p-3 border-t border-[var(--border-strong)] bg-[var(--bg-surface)] flex justify-end">
+      <button onclick="closeEncyclopedia()" class="btn px-4 py-1.5 rounded-lg text-xs bg-blue-600 hover:bg-blue-500 text-white font-medium">
+        Tushunarli, Yopish
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- 2. HAQIQAT JADVALI (TRUTH TABLE) MODALI -->
+<div id="truthTableModal" class="modal-overlay hidden">
+  <div class="modal-card w-[720px] max-w-[94vw] max-h-[85vh] flex flex-col p-5">
+    <div class="flex justify-between items-center mb-3">
+      <div>
+        <h3 class="text-base font-bold text-[var(--text-main)] flex items-center gap-2">
+          <span>📊</span> Haqiqat Jadvali (Truth Table)
+        </h3>
+        <p class="text-xs text-[var(--text-muted)]">Barcha kirish va chiqish signallarining kombinatsiyalari</p>
+      </div>
+      <button onclick="closeTruthTable()" class="text-[var(--text-muted)] hover:text-[var(--text-main)] text-xl">✕</button>
+    </div>
+    <div id="truthTableContent" class="flex-1 overflow-auto border border-[var(--border-strong)] rounded-xl bg-[var(--bg-app)] p-2"></div>
+    <div class="mt-4 flex justify-between items-center">
+      <span class="text-xs text-[var(--text-muted)]" id="truthTableStats">0 ta qator hisoblandi</span>
+      <div class="flex gap-2">
+        <button onclick="exportTruthTableCSV()" class="btn px-3 py-1.5 rounded-lg text-xs bg-blue-600 hover:bg-blue-500 text-white font-medium flex items-center gap-1.5">
+          <span>📥</span> CSV Export
+        </button>
+        <button onclick="closeTruthTable()" class="btn px-3 py-1.5 rounded-lg text-xs bg-[var(--bg-card)] hover:bg-[var(--bg-surface-hover)] text-[var(--text-main)] border border-[var(--border-strong)]">
+          Yopish
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Yashirin fayl yuklash inputi -->
+<input type="file" id="fileInput" accept=".json" class="hidden" onchange="handleFileLoad(event)">
+
+<!-- JS ENGINE -->
+<script src="app.js"></script>
+</body>
+</html>

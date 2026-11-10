@@ -1,0 +1,24 @@
+{
+  "name": "logicraft-pro",
+  "version": "3.5.0",
+  "description": "Sanoat darajasidagi mantiqiy elementlar va sxematexnika simulyatori (Mobile + Desktop, Dark & Light Mode)",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve .",
+    "dev": "npx serve .",
+    "build": "echo 'Static project ready for deployment'"
+  },
+  "keywords": [
+    "logic-gates",
+    "circuit-simulator",
+    "electronics",
+    "digital-logic",
+    "schematics",
+    "flip-flop",
+    "oscilloscope",
+    "uzbek",
+    "education"
+  ],
+  "author": "LogiCraft Team",
+  "license": "MIT"
+}

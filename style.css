@@ -1,0 +1,299 @@
+/* ===================================================================
+   LOGICRAFT PRO v3.5 - STYLES & THEMES
+   Avtomatlashtirilgan Mantiqiy Elementlar & Sxematexnika Simulyatori
+   Mobile + Desktop Responsive, Dark & Light Mode
+   =================================================================== */
+
+:root {
+  /* Dark Mode (Default) */
+  --bg-app: #070b14;
+  --bg-sidebar: #0c1322;
+  --bg-header: #0c1322;
+  --bg-surface: #131b2e;
+  --bg-surface-hover: #1c273e;
+  --bg-card: #141d2e;
+  --bg-input: #162032;
+  --bg-hud: rgba(15, 23, 42, 0.94);
+  --border-subtle: #1e293b;
+  --border-strong: #27374f;
+  --border-focus: #38bdf8;
+  --text-main: #f1f5f9;
+  --text-muted: #94a3b8;
+  --text-faint: #475569;
+  --canvas-bg: #070b14;
+  --canvas-grid: #121a2c;
+  --canvas-grid-major: #19243d;
+  --gate-body-top: #162032;
+  --gate-body-bottom: #0c1322;
+  
+  /* Signal & Accent Colors */
+  --wire-high: #22c55e;
+  --wire-high-glow: rgba(34, 197, 94, 0.45);
+  --wire-low: #475569;
+  --wire-selected: #38bdf8;
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
+  --accent-cyan: #06b6d4;
+  --accent-pink: #ec4899;
+  --accent-amber: #f59e0b;
+  --accent-emerald: #10b981;
+  --accent-purple: #8b5cf6;
+  --accent-rose: #f43f5e;
+  
+  --shadow-panel: 0 10px 25px -5px rgba(0, 0, 0, 0.6), 0 0 15px rgba(0, 0, 0, 0.4);
+}
+
+/* Light Theme Variables */
+body.light-theme {
+  --bg-app: #f1f5f9;
+  --bg-sidebar: #ffffff;
+  --bg-header: #ffffff;
+  --bg-surface: #f8fafc;
+  --bg-surface-hover: #e2e8f0;
+  --bg-card: #f8fafc;
+  --bg-input: #ffffff;
+  --bg-hud: rgba(255, 255, 255, 0.96);
+  --border-subtle: #e2e8f0;
+  --border-strong: #cbd5e1;
+  --border-focus: #0284c7;
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --text-faint: #94a3b8;
+  --canvas-bg: #f8fafc;
+  --canvas-grid: #e2e8f0;
+  --canvas-grid-major: #cbd5e1;
+  --gate-body-top: #ffffff;
+  --gate-body-bottom: #f1f5f9;
+  
+  --wire-high: #16a34a;
+  --wire-high-glow: rgba(22, 163, 74, 0.35);
+  --wire-low: #94a3b8;
+  --wire-selected: #0284c7;
+  
+  --shadow-panel: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 4px 10px rgba(0, 0, 0, 0.05);
+}
+
+/* Reset & Base */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  background-color: var(--bg-app);
+  color: var(--text-main);
+  user-select: none;
+  -webkit-user-select: none;
+  transition: background-color 0.25s ease, color 0.25s ease;
+}
+
+canvas#canvas {
+  display: block;
+  touch-action: none; /* Muhim: Mobil ekranda default pinch/scroll to'xtatilib, JS touch bilan boshqariladi */
+  cursor: default;
+}
+
+/* Buttons & Interactive Elements */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.375rem;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.btn:active {
+  transform: scale(0.96);
+}
+
+.btn-default {
+  background: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border-strong);
+}
+
+.btn-default:hover {
+  background: var(--bg-surface-hover);
+  border-color: var(--border-focus);
+}
+
+.btn-primary {
+  background: var(--primary);
+  color: #ffffff;
+  border: 1px solid var(--primary-hover);
+}
+
+.btn-primary:hover {
+  background: var(--primary-hover);
+}
+
+/* Sidebar Components */
+.sidebar-item {
+  cursor: grab;
+  transition: all 0.15s ease;
+  border: 1px solid var(--border-subtle);
+  background: var(--bg-card);
+  color: var(--text-main);
+}
+
+.sidebar-item:hover {
+  transform: translateX(3px);
+  background: var(--bg-surface-hover);
+  border-color: var(--border-strong);
+}
+
+.sidebar-item:active {
+  cursor: grabbing;
+}
+
+/* Badges */
+.badge {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-app);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--border-strong);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--text-muted);
+}
+
+/* Floating HUD Inspector */
+#hudInspector {
+  position: absolute;
+  pointer-events: none;
+  z-index: 60;
+  transition: opacity 0.12s ease;
+  min-width: 280px;
+  max-width: 340px;
+  background: var(--bg-hud);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border: 1px solid var(--border-strong);
+  box-shadow: var(--shadow-panel);
+  border-radius: 12px;
+  padding: 12px;
+}
+
+/* Modals */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+  padding: 1rem;
+}
+
+.modal-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 16px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* Oscilloscope / Logic Analyzer Drawer */
+#analyzerDrawer {
+  position: absolute;
+  bottom: 26px; /* ustiga status bar */
+  left: 0;
+  right: 0;
+  height: 170px;
+  background: var(--bg-sidebar);
+  border-top: 1px solid var(--border-strong);
+  z-index: 35;
+  transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.3);
+}
+
+#analyzerDrawer.collapsed {
+  transform: translateY(100%);
+}
+
+/* Mobile Sidebar Drawer Overlay */
+@media (max-width: 768px) {
+  #sidebar {
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    width: 285px;
+    z-index: 70;
+    transform: translateX(-100%);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    box-shadow: 10px 0 25px rgba(0, 0, 0, 0.5);
+  }
+
+  #sidebar.open {
+    transform: translateX(0);
+  }
+
+  #sidebarBackdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(3px);
+    z-index: 65;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+
+  #sidebarBackdrop.open {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  /* Hide minimap on very small mobile screens to keep canvas clear */
+  #minimapContainer {
+    display: none;
+  }
+
+  /* Mobile floating toolbar */
+  #mobileQuickBar {
+    display: flex !important;
+  }
+}
+
+/* Pulse animation for active wires & nodes */
+@keyframes wireGlow {
+  0% { filter: drop-shadow(0 0 2px var(--wire-high)); }
+  50% { filter: drop-shadow(0 0 7px var(--wire-high)); }
+  100% { filter: drop-shadow(0 0 2px var(--wire-high)); }
+}
+
+.glowing {
+  animation: wireGlow 1.5s infinite ease-in-out;
+}
